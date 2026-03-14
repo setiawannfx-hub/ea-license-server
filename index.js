@@ -1,6 +1,8 @@
 const express = require("express");
 const { Pool } = require("pg");
 
+const ADMIN_KEY = process.env.ADMIN_KEY || "MY_SECRET_PASSWORD";
+
 const app = express();
 
 const pool = new Pool({
@@ -34,6 +36,14 @@ app.get("/",(req,res)=>{
 // ===============================
 app.get("/generate", async (req,res)=>{
 
+const admin = req.query.admin;
+
+// cek password admin
+if(admin !== ADMIN_KEY)
+{
+ return res.json({status:"unauthorized"});
+}
+
 const product = req.query.product || "SSFX";
 const days = req.query.days;
 const lifetime = req.query.lifetime;
@@ -53,24 +63,24 @@ else
  expiry = d.toISOString().split("T")[0];
 }
 
- const key = generateKey();
+const key = generateKey();
 
- try{
+try{
 
-  await pool.query(
-   "INSERT INTO licenses(license_key,product,expiry,status) VALUES($1,$2,$3,'active')",
-   [key,product,expiry]
-  );
+ await pool.query(
+  "INSERT INTO licenses(license_key,product,expiry,status) VALUES($1,$2,$3,'active')",
+  [key,product,expiry]
+ );
 
-  res.json({
-   status:"ok",
-   license_key:key
-  });
+ res.json({
+  status:"ok",
+  license_key:key
+ });
 
- }catch(e)
- {
-  res.json({status:"error"});
- }
+}catch(e)
+{
+ res.json({status:"error"});
+}
 
 });
 
