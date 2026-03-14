@@ -1,7 +1,7 @@
 const express = require("express");
 const { Pool } = require("pg");
 
-const ADMIN_KEY = process.env.ADMIN_KEY || "MY_SECRET_PASSWORD";
+const ADMIN_KEY = process.env.ADMIN_KEY || "kontolodong";
 
 const app = express();
 
